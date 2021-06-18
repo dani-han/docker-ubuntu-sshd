@@ -6,7 +6,7 @@ Dockerized SSH Daemon (sshd) top on the official Ubuntu images.
 ## Installed packages
 
 Base:
-* ubuntu:latest
+* ubuntu[:tag]
 
 Image Specific:
 * openssh-server
@@ -19,9 +19,24 @@ Configs:
 
 ## Usage
 
-* Build and Start Ubuntu
+* Build and Run Ubuntu
 ```sh
-docker-compose up -d
+docker-compose up -d --build
+```
+
+* Build
+```sh
+docker build -t ubuntu_sshd -f sshd.dockerfile .
+```
+
+* Build (with Ubuntu:tag)
+```sh
+tag=latest; docker build -t ubuntu_sshd:$tag --build-arg TAG=$tag -f sshd.dockerfile .
+```
+
+* Run
+```sh
+docker run --name ubuntu_sshd -d -p 22:22 -e "HOSTHOME=$HOME" -v "$HOME/:/host/$HOME" ubuntu_sshd
 ```
 
 * How to restart sshd
@@ -31,5 +46,5 @@ docker container (start|restart|stop) ubuntu_sshd
 
 * Attach shell
 ```sh
-docker exec -it ubuntu_sshd_1 bash
+docker exec -it ubuntu_sshd bash
 ```

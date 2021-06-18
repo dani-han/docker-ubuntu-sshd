@@ -3,7 +3,9 @@ services:
     sshd:
         build:
             context: .
-            dockerfile: sshd.dockerfile
+            dockerfile: sshd.Dockerfile
+            args: 
+                TAG: latest
         environment: 
             HOSTHOME: $HOME
         ports: 
