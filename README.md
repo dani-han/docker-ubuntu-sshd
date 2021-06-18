@@ -5,46 +5,61 @@ Dockerized SSH Daemon (sshd) top on the official Ubuntu images.
 
 ## Installed packages
 
-Base:
+Base Image:
 * ubuntu[:tag]
 
-Image Specific:
+Image specific packages to be installed:
 * openssh-server
 
-Configs:
-* exposed port 22
-* default command: `/run-sshd.sh` (`sshd.run.sh`: copy the public key of the user who created the container.)
-* You must use `~/.ssh/id_rsa` for making connection to `root@localhost:22`
-* user home (`/home/$USER`) attached to `/host/home/$USER`
+Build (`docker build`) configs:
+* default command: `/run-sshd.sh`
+
+Test run (`docker run -d`) configs:
+* exposed port
+    * `-p 22:22`
+* environment `-e`
+    * `HOSTHOME=/home/$USER`
+* volume `-v`
+    * `/home/$USER:/host/home/$USER`
+
+## Test run
+What is done in run command under the above test run configs:
+* `/run-sshd.sh` will be run
+    * copy the public key from `/host/HOME/USER/.ssh/id_rsa.pub` to `/root/.ssh/authorized_keys`.
+* from host terminal run:
+    * `ssh root@localhost`
+    * ssh session will open with your private key `~/.ssh/id_rsa`
 
 ## Usage
 
 * Build and Run Ubuntu
 ```sh
-docker-compose up -d --build
+docker-compose up -d
 ```
 
 * Build
 ```sh
-docker build -t ubuntu_sshd -f sshd.dockerfile .
+docker build -t ubuntu_sshd .
 ```
 
 * Build (with Ubuntu:tag)
 ```sh
-tag=latest; docker build -t ubuntu_sshd:$tag --build-arg TAG=$tag -f sshd.dockerfile .
+tag=latest; docker build -t ubuntu_sshd:$tag --build-arg TAG=$tag .
 ```
 
 * Run
 ```sh
-docker run --name ubuntu_sshd -d -p 22:22 -e "HOSTHOME=$HOME" -v "$HOME/:/host/$HOME" ubuntu_sshd
+docker run --name ubuntu_1 -d -p 22:22 -e "HOSTHOME=$HOME" -v "$HOME:/host/$HOME" ubuntu_sshd
 ```
 
-* How to restart sshd
+* Manage container
 ```sh
-docker container (start|restart|stop) ubuntu_sshd
-```
+# Start|restart|stop container
+docker container (start|restart|stop) ubuntu_1
 
-* Attach shell
-```sh
-docker exec -it ubuntu_sshd bash
+# Attach shell (on started container)
+docker exec -it ubuntu_1 bash
+
+# View logs
+docker logs -ft ubuntu_1
 ```
