@@ -1,4 +1,4 @@
-ARG TAG=latest
+ARG TAG=20.04
 FROM ubuntu:${TAG}
 
 RUN apt update && apt install -y openssh-server
